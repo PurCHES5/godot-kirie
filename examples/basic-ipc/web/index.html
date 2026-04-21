@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kirie Basic IPC</title>
+  <style>
+    body, html, .card {
+      background: transparent;
+    }
+
+    .row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    pre {
+      margin: 0;
+      padding: 0.9rem;
+      border-radius: 14px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <section class="card">
+    <h1>Kirie Basic IPC</h1>
+    <p>
+      This page sends a <code>web_ready</code> message on load and listens for
+      <code>kirie:ipc-message</code> events dispatched by the Android bridge.
+    </p>
+    <div class="row">
+      <button id="sendButton" type="button">Send web_ping</button>
+    </div>
+    <pre id="log">Page booting…</pre>
+  </section>
+
+  <script>
+    const logNode = document.getElementById("log");
+
+    function appendLog(line) {
+      logNode.textContent = `${logNode.textContent}\n${line}`;
+      console.log(line);
+    }
+
+    function postToGodot(message) {
+      const bridge = globalThis.KirieAndroidBridge;
+      if (!bridge || typeof bridge.postMessage !== "function") {
+        appendLog("KirieAndroidBridge.postMessage is unavailable");
+        return;
+      }
+
+      const encoded = JSON.stringify(message);
+      bridge.postMessage(encoded);
+      appendLog(`Sent to Godot: ${encoded}`);
+    }
+
+    window.addEventListener("kirie:ipc-message", (event) => {
+      appendLog(`Received from Godot: ${JSON.stringify(event.detail)}`);
+    });
+
+    document.getElementById("sendButton").addEventListener("click", () => {
+      postToGodot({
+        type: "web_ping",
+        payload: {
+          source: "web",
+        },
+      });
+    });
+
+    postToGodot({
+      type: "web_ready",
+      payload: {
+        userAgent: navigator.userAgent,
+      },
+    });
+  </script>
+</body>
+</html>

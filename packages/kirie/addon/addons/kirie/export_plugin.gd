@@ -31,5 +31,7 @@ func _get_android_libraries(
 	_platform: EditorExportPlatform,
 	_debug: bool
 ) -> PackedStringArray:
-	return PackedStringArray()
+	if _debug:
+		return PackedStringArray(["kirie/libraries/android/Kirie-debug.aar"])
 
+	return PackedStringArray()

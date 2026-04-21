@@ -1,12 +1,61 @@
 # basic-ipc
 
-This example will become the first real integration target for Kirie.
+This example is the first runnable Kirie integration target.
 
-Its scope is intentionally small:
+It is intentionally small and focuses on one path:
 
-- initialize the Kirie plugin
-- create a WebView
-- send a message from Godot to the page
-- send a message from the page back to Godot
-- validate one request/response round-trip
+1. Godot creates a single WebView
+2. the loaded page sends `web_ready` to Godot
+3. Godot replies with `godot_ready`
+4. both sides log the exchanged payloads
 
+## Layout
+
+- `project.godot`
+  the Godot project
+- `main.tscn`
+  the main test scene
+- `scripts/main.gd`
+  the scene logic
+- `web/index.html`
+  a tiny page for WebView IPC testing
+
+## Running the web side
+
+Serve the `web/` directory with any simple static server and use that URL in the
+project UI.
+
+Example:
+
+```sh
+cd examples/basic-ipc/web
+python3 -m http.server 8000
+```
+
+Then open the Godot project and use:
+
+`http://10.0.2.2:8000/`
+
+for an Android emulator, or an appropriate LAN/local address for a device.
+
+## Running the Godot side
+
+Recommended to use [GodotEnv](https://github.com/chickensoft-games/GodotEnv) to manage Godot versions.
+
+You can use the command below to set current Godot version for this project:
+
+```bash
+godotenv godot use 4.6.2
+```
+
+Then run the Godot editor with the current project:
+
+```bash
+"$(godotenv godot env path)" ./examples/basic-ipc/project.godot
+```
+
+You can also run the game directly from the command line:
+
+```bash
+"$(godotenv godot env path)" --path ./examples/basic-ipc
+```

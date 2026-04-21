@@ -21,9 +21,20 @@ android {
 
         manifestPlaceholders["godotPluginName"] = pluginName
         manifestPlaceholders["godotPluginPackageName"] = pluginPackageName
+        manifestPlaceholders["kirieUsesCleartextTraffic"] = "false"
         buildConfigField("String", "GODOT_PLUGIN_NAME", "\"$pluginName\"")
         setProperty("archivesBaseName", pluginName)
         consumerProguardFiles("consumer-rules.pro")
+    }
+
+    buildTypes {
+        debug {
+            manifestPlaceholders["kirieUsesCleartextTraffic"] = "true"
+        }
+
+        release {
+            manifestPlaceholders["kirieUsesCleartextTraffic"] = "false"
+        }
     }
 
     compileOptions {
@@ -41,4 +52,3 @@ android {
 dependencies {
     implementation("org.godotengine:godot:4.6.2.stable")
 }
-

@@ -18,7 +18,7 @@ required to make the current IPC milestone work.
 
 - `packages/kirie/addon/addons/kirie`
   Godot-facing plugin files, including `plugin.gd`, `export_plugin.gd`,
-  `kirie.gd`, and `kirie_view.gd`
+  `gd_kirie.gd`, and `kirie_view.gd`
 - `packages/kirie/native/android`
   Kotlin Android implementation
 - `packages/kirie/native/ios`

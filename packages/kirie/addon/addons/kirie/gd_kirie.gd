@@ -1,4 +1,4 @@
-class_name Kirie
+class_name GdKirie
 extends Object
 
 const PLUGIN_SINGLETON_NAME := "Kirie"

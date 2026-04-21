@@ -12,3 +12,4 @@ build/
 *.aar
 *.xcframework
 
+.build_version

@@ -9,7 +9,7 @@ signal ipc_error(error: String)
 @export var auto_create := true
 @export var auto_destroy := true
 
-var _kirie := Kirie.new()
+var _kirie := GdKirie.new()
 
 
 func _ready() -> void:
