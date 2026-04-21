@@ -1,0 +1,10 @@
+{
+  "name": "@kirie/kirie",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Build pipeline not implemented yet'",
+    "typecheck": "echo 'TypeScript packages are not introduced yet'"
+  }
+}
+
