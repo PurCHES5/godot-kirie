@@ -27,6 +27,10 @@ Current public Godot-facing names should stay close to that low-level role:
 - `load_url(url)`
 - `send_ipc_message(message)`
 
+The Godot-facing `Kirie` script is expected to stay a thin wrapper over the
+platform singleton, keeping naming and serialization concerns on the Godot side
+without duplicating native lifecycle logic.
+
 Current signals should also stay narrow:
 
 - `webview_ready`

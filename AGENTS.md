@@ -45,6 +45,8 @@ on memory for Godot plugin APIs or platform WebView behavior.
   to layers above `kirie`, such as future adapters.
 - For the current milestone, assume a single active WebView unless the user
   explicitly asks to reintroduce multi-WebView behavior.
+- Keep the Godot-facing wrapper thin; prefer forwarding to the platform
+  singleton over reimplementing platform lifecycle logic in GDScript.
 - If an API is needed by both GDScript and C#, define the shape once and keep
   C# as a thin wrapper.
 

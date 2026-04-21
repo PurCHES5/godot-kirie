@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 
 class KirieWebViewManager(
     private val activityProvider: () -> Activity?,
+    private val onWebViewReady: () -> Unit,
     private val onIpcMessage: (messageJson: String) -> Unit,
     private val onIpcError: (message: String) -> Unit,
 ) {
@@ -54,6 +55,7 @@ class KirieWebViewManager(
 
             rootView.addView(createdWebView)
             webView = createdWebView
+            onWebViewReady()
 
             if (!initialUrl.isNullOrBlank()) {
                 createdWebView.loadUrl(initialUrl)
