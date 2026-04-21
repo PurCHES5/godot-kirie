@@ -43,3 +43,6 @@ deferred until there is a real need for them.
 For the current milestone, Kirie intentionally supports a single active WebView.
 Multi-WebView support is deferred until the single-WebView bridge is working end
 to end.
+
+Kirie is also expected to support loading offline web content from Godot project
+resources in the future, including content authored under `res://`.

@@ -47,6 +47,8 @@ on memory for Godot plugin APIs or platform WebView behavior.
   explicitly asks to reintroduce multi-WebView behavior.
 - Keep the Godot-facing wrapper thin; prefer forwarding to the platform
   singleton over reimplementing platform lifecycle logic in GDScript.
+- Keep in mind that Kirie is expected to support offline web content sourced
+  from project resources, including future `res://`-based loading flows.
 - If an API is needed by both GDScript and C#, define the shape once and keep
   C# as a thin wrapper.
 
