@@ -32,4 +32,4 @@ The first milestone is limited to:
 
 At this stage, Kirie is intended to stay a low-level WebView and IPC bridge.
 Higher-level semantics are intentionally deferred to future layers such as an
-`eventa` adapter.
+`eventa` adapter or a small browser-facing `KirieIpcBridge` SDK.

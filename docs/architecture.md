@@ -12,13 +12,18 @@ We are standardizing only the minimum plugin shape needed to support:
 Anything beyond that, such as dedicated protocol packages, CLI tooling, or
 adapters, is deferred until the IPC model is proven.
 
+This also includes a future browser-facing SDK layer. A minimal
+`KirieIpcBridge` may later provide a platform-neutral JavaScript entry point on
+top of the native transport, but it is not part of the current IPC bring-up
+scope.
+
 ## Current Godot API direction
 
 `kirie` is the low-level WebView and IPC bridge.
 
 Higher-level semantics such as event routing, richer message contracts, or
 request/response abstractions are expected to live above this layer, for example
-in future adapters such as `eventa`.
+in future adapters such as `eventa` or a browser-facing `KirieIpcBridge` SDK.
 
 Current public Godot-facing names should stay close to that low-level role:
 

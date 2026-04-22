@@ -14,6 +14,10 @@ The current milestone is limited to:
 Do not introduce extra packages, adapters, or CLI workflows unless they are
 required to make the current IPC milestone work.
 
+A future browser-facing `KirieIpcBridge` SDK is allowed as a follow-up layer,
+but it is not part of the current milestone unless the user explicitly asks for
+it.
+
 ## Repository Layout
 
 - `packages/kirie/addon/addons/kirie`
@@ -43,6 +47,8 @@ on memory for Godot plugin APIs or platform WebView behavior.
   application event layer.
 - Defer higher-level semantics such as invocation APIs and richer event models
   to layers above `kirie`, such as future adapters.
+- Defer browser-side convenience wrappers such as `KirieIpcBridge` until after
+  the native IPC path is working end to end.
 - For the current milestone, assume a single active WebView unless the user
   explicitly asks to reintroduce multi-WebView behavior.
 - Keep the Godot-facing wrapper thin; prefer forwarding to the platform
@@ -195,6 +201,8 @@ infrastructure.
   checks.
 - Code generation pipelines for future C# wrappers or shared API declarations do
   not exist yet.
+- A browser-facing `KirieIpcBridge` SDK shape is being considered for future
+  cross-platform web usage, but it is not implemented yet.
 - Binary distribution policy is not finalized yet for Android Maven artifacts,
   local `.aar` files, or iOS plugin packaging outputs.
 - An editor-driven generated `gdip` shim flow is being considered for future
