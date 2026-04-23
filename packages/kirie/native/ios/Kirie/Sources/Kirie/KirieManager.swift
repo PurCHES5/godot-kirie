@@ -2,10 +2,6 @@ import Foundation
 import UIKit
 import WebKit
 
-private enum KirieTrace {
-    static let buildMarker = "TRACE-2026-04-23-IPC"
-}
-
 private extension Notification.Name {
     static let kirieWebViewReady = Notification.Name("KirieWebViewReady")
     static let kirieIpcMessageReceived = Notification.Name("KirieIpcMessageReceived")
@@ -20,27 +16,10 @@ final class KirieManager: NSObject {
     private let sessionID = UUID().uuidString.lowercased()
     private var containerView: UIView?
     private var webView: WKWebView?
-    private var hasStarted = false
 
     private override init() {
         super.init()
         logInfo("Manager initialized")
-    }
-
-    func start() {
-        guard !hasStarted else {
-            logInfo("start() ignored because the manager has already started")
-            return
-        }
-
-        hasStarted = true
-        logInfo("Manager started; mainBundle=\(Bundle.main.bundleIdentifier ?? "<nil>")")
-    }
-
-    func stop() {
-        logInfo("stop() invoked")
-        destroyWebView()
-        hasStarted = false
     }
 
     func createWebView(initialURL: String?) {
@@ -236,11 +215,11 @@ final class KirieManager: NSObject {
     }
 
     private func logInfo(_ message: String) {
-        NSLog("[Kirie][%@][session=%@] %@", KirieTrace.buildMarker, sessionID, message)
+        NSLog("[Kirie][session=%@] %@", sessionID, message)
     }
 
     private func logError(_ message: String) {
-        NSLog("[Kirie][%@][session=%@] ERROR %@", KirieTrace.buildMarker, sessionID, message)
+        NSLog("[Kirie][session=%@] ERROR %@", sessionID, message)
     }
 }
 

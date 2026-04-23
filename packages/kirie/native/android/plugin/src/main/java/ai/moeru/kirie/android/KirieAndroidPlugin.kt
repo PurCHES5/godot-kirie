@@ -57,7 +57,6 @@ class KirieAndroidPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     private fun handleIpcMessage(messageJson: String) {
-        Log.d(pluginName, "ipc_message_received message=$messageJson")
         emitSignal(SIGNAL_IPC_MESSAGE_RECEIVED, messageJson)
     }
 

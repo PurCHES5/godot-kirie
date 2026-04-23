@@ -1,23 +1,17 @@
 import Dispatch
 import Foundation
 
-private let kirieEntryMarker = "TRACE-2026-03-19-13:33Z"
-
 @_cdecl("kirie_swift_init")
 public func kirie_swift_init() {
-    NSLog("[Kirie][%@] kirie_swift_init() called", kirieEntryMarker)
     DispatchQueue.main.async {
-        NSLog("[Kirie][%@] kirie_swift_init() executing on main queue", kirieEntryMarker)
-        KirieManager.shared.start()
+        _ = KirieManager.shared
     }
 }
 
 @_cdecl("kirie_swift_deinit")
 public func kirie_swift_deinit() {
-    NSLog("[Kirie][%@] kirie_swift_deinit() called", kirieEntryMarker)
     DispatchQueue.main.async {
-        NSLog("[Kirie][%@] kirie_swift_deinit() executing on main queue", kirieEntryMarker)
-        KirieManager.shared.stop()
+        KirieManager.shared.destroyWebView()
     }
 }
 
