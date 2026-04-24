@@ -12,7 +12,7 @@ It is intentionally small and focuses on one path:
 The example now supports two ways to exercise that path:
 
 1. a manual remote page loaded from `web/index.html`
-2. a minimal inline probe loaded through `load_html_string()`
+2. the local probe page loaded through `load_html_string()`
 
 ## Layout
 
@@ -47,7 +47,7 @@ for an Android emulator, or an appropriate LAN/local address for a device.
 
 Open the Godot project and press `Run Probe`.
 
-This creates a WebView if needed, loads a tiny inline HTML page through
+This creates a WebView if needed, reads `res://web/index.html`, loads it through
 `load_html_string()`, and performs a minimal round-trip:
 
 1. probe sends `web_ready`
