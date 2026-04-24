@@ -17,6 +17,38 @@ This also includes a future browser-facing SDK layer. A minimal
 top of the native transport, but it is not part of the current IPC bring-up
 scope.
 
+## Deferred debugging and automation direction
+
+For the current milestone, automation should prefer project-owned observability:
+
+- explicit probe logs
+- success or failure markers
+- targeted scene-tree dumps when investigating lifecycle issues
+
+This keeps the IPC bring-up dependent on interfaces that Kirie owns directly,
+instead of coupling early automation to editor-facing debugger behavior.
+
+A longer-term direction is to evaluate whether Godot's remote debugging
+transport exposed through `--remote-debug` can support richer external
+inspection for Kirie runs. See [References](./references.md), especially:
+
+- Command line tutorial
+- Overview of debugging tools
+- Debugger panel
+- EditorSettings
+
+That work is intentionally deferred until the Android and iOS WebView IPC path
+is stable.
+
+If it becomes practical, the intended value is:
+
+- external inspection beyond plain log scraping
+- possible access to scene-tree or debugger state during automated runs
+- a better foundation for future AI-assisted debugging and diagnosis
+
+Until then, logs and project-owned debug hooks remain the primary supported
+automation interfaces.
+
 ## Current Godot API direction
 
 `kirie` is the low-level WebView and IPC bridge.

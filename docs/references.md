@@ -9,6 +9,16 @@ packaging, or platform WebView bridge details.
 
 - [Godot Android plugins (stable)](https://docs.godotengine.org/en/stable/tutorials/platform/android/android_plugin.html)
   Main reference for Godot Android plugin v2 packaging and export flow.
+- [Command line tutorial (stable)](https://docs.godotengine.org/en/stable/tutorials/editor/command_line_tutorial.html)
+  Reference for `--remote-debug`, command-line running, and export behavior.
+- [Overview of debugging tools (stable)](https://docs.godotengine.org/en/stable/tutorials/scripting/debug/overview_of_debugging_tools.html)
+  High-level reference for remote debugging and editor debugging workflows.
+- [Debugger panel (stable)](https://docs.godotengine.org/en/stable/tutorials/scripting/debug/debugger_panel.html)
+  Reference for runtime debugger capabilities such as scene inspection and
+  stack or variable introspection.
+- [EditorSettings (stable)](https://docs.godotengine.org/en/stable/classes/class_editorsettings.html)
+  Reference for editor debugger settings such as automatic switching to the
+  remote scene tree.
 - [EditorExportPlugin (stable)](https://docs.godotengine.org/en/stable/classes/class_editorexportplugin.html)
   Reference for `_get_android_libraries()`,
   `_get_android_dependencies()`, and related export hooks.
