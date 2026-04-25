@@ -26,7 +26,7 @@ class KirieWebViewManager(
             val existingWebView = webView
             if (existingWebView != null) {
                 if (!initialUrl.isNullOrBlank()) {
-                    existingWebView.loadUrl(initialUrl)
+                    loadResolvedUrl(existingWebView, initialUrl)
                 }
                 return@runOnUiThread
             }
@@ -51,14 +51,17 @@ class KirieWebViewManager(
             }
 
             createdWebView.addJavascriptInterface(javascriptBridge, KirieJavascriptBridge.BRIDGE_NAME)
-            createdWebView.webViewClient = DebugTlsBypassWebViewClient(serverUrl = initialUrl)
+            createdWebView.webViewClient = DebugTlsBypassWebViewClient(
+                serverUrl = initialUrl,
+                assetRequestHandler = KirieAssetRequestHandler(activity.assets),
+            )
 
             rootView.addView(createdWebView)
             webView = createdWebView
             onWebViewReady()
 
             if (!initialUrl.isNullOrBlank()) {
-                createdWebView.loadUrl(initialUrl)
+                loadResolvedUrl(createdWebView, initialUrl)
             }
         }
     }
@@ -93,7 +96,7 @@ class KirieWebViewManager(
                 return@runOnUiThread
             }
 
-            existingWebView.loadUrl(url)
+            loadResolvedUrl(existingWebView, url)
         }
     }
 
@@ -140,6 +143,17 @@ class KirieWebViewManager(
     private fun runOnUiThread(block: () -> Unit) {
         val activity = activityProvider() ?: return
         activity.runOnUiThread(block)
+    }
+
+    private fun loadResolvedUrl(webView: WebView, url: String) {
+        val resolvedUrl = try {
+            KirieUrlResolver.resolveForWebView(url)
+        } catch (error: IllegalArgumentException) {
+            onIpcError(error.message ?: "Cannot load URL: $url")
+            return
+        }
+
+        webView.loadUrl(resolvedUrl)
     }
 
     private fun WebView.removeFromSuperview() {

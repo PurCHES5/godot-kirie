@@ -13,6 +13,14 @@ Current responsibility:
 - create and manage the Android WebView
 - expose a Godot Android plugin singleton
 - bridge low-level IPC messages between Godot and web content
+- resolve `res://` web URLs to files exported into the APK/AAB assets
+
+`res://` loading is intentionally limited to packaged application assets. The
+Android implementation rewrites `res://web/index.html` to Kirie's local asset
+origin and serves `web/index.html` from the APK/AAB assets through the WebView
+request handler. `res://web` resolves to `web/index.html`. Runtime-mounted Godot
+packs are not part of this path. `http://`, `https://`, and `file://` URLs keep
+the default Android WebView loading behavior.
 
 Notes:
 

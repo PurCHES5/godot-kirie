@@ -4,12 +4,22 @@ import android.net.Uri
 import android.net.http.SslError
 import android.util.Log
 import android.webkit.SslErrorHandler
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
 class DebugTlsBypassWebViewClient(
     private val serverUrl: String?,
+    private val assetRequestHandler: KirieAssetRequestHandler,
 ) : WebViewClient() {
+    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+        if (!KirieUrlResolver.isResolvedAssetUrl(request.url)) {
+            return null
+        }
+
+        return assetRequestHandler.open(request.url)
+    }
 
     override fun onReceivedSslError(
         view: WebView,
@@ -55,39 +65,19 @@ class DebugTlsBypassWebViewClient(
     }
 
     private fun isLocalDevelopmentHost(host: String?): Boolean {
-        if (host.isNullOrBlank()) {
-            return false
+        return if (host.isNullOrBlank()) {
+            false
+        } else when {
+            host.equals("localhost", ignoreCase = true) -> true
+            host == "127.0.0.1" || host == "10.0.2.2" || host == "10.0.3.2" || host == "::1" -> true
+            host.endsWith(".local") -> true
+            host.startsWith("10.") || host.startsWith("192.168.") -> true
+            host.startsWith("172.") -> {
+                val secondOctet = host.split('.').getOrNull(1)?.toIntOrNull()
+                secondOctet in 16..31
+            }
+            else -> false
         }
-
-        if (
-            host.equals("localhost", ignoreCase = true) ||
-            host == "127.0.0.1" ||
-            host == "10.0.2.2" ||
-            host == "10.0.3.2" ||
-            host == "::1"
-        ) {
-            return true
-        }
-
-        if (host.endsWith(".local")) {
-            return true
-        }
-
-        if (host.startsWith("10.") || host.startsWith("192.168.")) {
-            return true
-        }
-
-        if (!host.startsWith("172.")) {
-            return false
-        }
-
-        val segments = host.split('.')
-        if (segments.size < 2) {
-            return false
-        }
-
-        val secondOctet = segments[1].toIntOrNull() ?: return false
-        return secondOctet in 16..31
     }
 
     private fun normalizePort(uri: Uri): Int {
