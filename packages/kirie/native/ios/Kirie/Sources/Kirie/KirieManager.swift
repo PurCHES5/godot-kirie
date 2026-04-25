@@ -23,6 +23,8 @@ final class KirieManager: NSObject {
     }
 
     func createWebView(initialURL: String?) {
+        logInfo("createWebView initialURL=\(initialURL ?? "<nil>")")
+
         guard let hostWindow = resolveHostWindow() else {
             emitIpcError("Cannot create WebView because no host window was found")
             return
@@ -51,6 +53,8 @@ final class KirieManager: NSObject {
     }
 
     func loadURL(_ url: String) {
+        logInfo("loadURL url=\(url)")
+
         guard let webView else {
             emitIpcError("Cannot load URL because the WebView does not exist")
             return
@@ -82,6 +86,8 @@ final class KirieManager: NSObject {
     }
 
     func sendIpcMessage(_ messageJSON: String) {
+        logInfo("sendIpcMessage message=\(messageJSON)")
+
         guard let webView else {
             emitIpcError("Cannot send IPC message because the WebView does not exist")
             return
@@ -96,23 +102,38 @@ final class KirieManager: NSObject {
                 Task { @MainActor in
                     self?.emitIpcError("Failed to dispatch IPC message to WebView: \(error.localizedDescription)")
                 }
+                return
+            }
+
+            Task { @MainActor in
+                self?.logInfo("Dispatched IPC message to WebView")
             }
         }
     }
 
     private func load(_ urlString: String, in webView: WKWebView) {
-        guard let url = URL(string: urlString) else {
-            emitIpcError("Cannot load invalid URL: \(urlString)")
+        let resolvedURL: KirieResolvedURL
+        do {
+            resolvedURL = try KirieURLResolver.resolveForWebView(urlString)
+        } catch {
+            emitIpcError(error.localizedDescription)
             return
         }
 
-        logInfo("Loading URL: \(url.absoluteString)")
-        webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
+        if let readAccessURL = resolvedURL.readAccessURL {
+            logInfo("Loading file URL: \(resolvedURL.url.absoluteString) readAccess=\(readAccessURL.path)")
+            webView.loadFileURL(resolvedURL.url, allowingReadAccessTo: readAccessURL)
+            return
+        }
+
+        logInfo("Loading URL: \(resolvedURL.url.absoluteString)")
+        webView.load(URLRequest(url: resolvedURL.url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
     }
 
     private func ensureContainerView(attachedTo hostView: UIView) -> UIView {
         if let existingContainerView = containerView {
             if existingContainerView.superview !== hostView {
+                logInfo("Reattaching existing container view")
                 existingContainerView.removeFromSuperview()
                 hostView.addSubview(existingContainerView)
                 pinToEdges(existingContainerView, in: hostView)
@@ -132,12 +153,14 @@ final class KirieManager: NSObject {
         pinToEdges(containerView, in: hostView)
 
         self.containerView = containerView
+        logInfo("Created container view")
         return containerView
     }
 
     private func ensureWebView(attachedTo containerView: UIView) -> WKWebView {
         if let existingWebView = webView {
             if existingWebView.superview !== containerView {
+                logInfo("Reattaching existing WebView")
                 existingWebView.removeFromSuperview()
                 containerView.addSubview(existingWebView)
                 pinToEdges(existingWebView, in: containerView)
@@ -201,6 +224,7 @@ final class KirieManager: NSObject {
     }
 
     private func emitWebViewReady() {
+        logInfo("Emitting webview_ready")
         notificationCenter.post(name: .kirieWebViewReady, object: nil)
     }
 
@@ -225,6 +249,8 @@ final class KirieManager: NSObject {
 
 extension KirieManager: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        logInfo("Received WKScriptMessage name=\(message.name) bodyType=\(type(of: message.body))")
+
         guard message.name == "kirie" else {
             return
         }
@@ -246,6 +272,18 @@ extension KirieManager: WKScriptMessageHandler {
 }
 
 extension KirieManager: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        logInfo("Navigation started url=\(webView.url?.absoluteString ?? "<nil>")")
+    }
+
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        logInfo("Navigation committed url=\(webView.url?.absoluteString ?? "<nil>")")
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        logInfo("Navigation finished url=\(webView.url?.absoluteString ?? "<nil>")")
+    }
+
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         emitIpcError("Navigation failed: \(error.localizedDescription)")
     }

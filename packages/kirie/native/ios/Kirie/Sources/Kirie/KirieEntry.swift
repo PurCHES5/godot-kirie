@@ -3,6 +3,7 @@ import Foundation
 
 @_cdecl("kirie_swift_init")
 public func kirie_swift_init() {
+    kirieLogEntry("kirie_swift_init")
     DispatchQueue.main.async {
         _ = KirieManager.shared
     }
@@ -10,6 +11,7 @@ public func kirie_swift_init() {
 
 @_cdecl("kirie_swift_deinit")
 public func kirie_swift_deinit() {
+    kirieLogEntry("kirie_swift_deinit")
     DispatchQueue.main.async {
         KirieManager.shared.destroyWebView()
     }
@@ -18,6 +20,7 @@ public func kirie_swift_deinit() {
 @_cdecl("kirie_swift_create_webview")
 public func kirie_swift_create_webview(_ initialURLPointer: UnsafePointer<CChar>?) {
     let initialURL = initialURLPointer.map { String(cString: $0) }
+    kirieLogEntry("kirie_swift_create_webview initialURL=\(initialURL ?? "<nil>")")
     DispatchQueue.main.async {
         KirieManager.shared.createWebView(initialURL: initialURL?.isEmpty == true ? nil : initialURL)
     }
@@ -25,6 +28,7 @@ public func kirie_swift_create_webview(_ initialURLPointer: UnsafePointer<CChar>
 
 @_cdecl("kirie_swift_destroy_webview")
 public func kirie_swift_destroy_webview() {
+    kirieLogEntry("kirie_swift_destroy_webview")
     DispatchQueue.main.async {
         KirieManager.shared.destroyWebView()
     }
@@ -33,10 +37,12 @@ public func kirie_swift_destroy_webview() {
 @_cdecl("kirie_swift_load_url")
 public func kirie_swift_load_url(_ urlPointer: UnsafePointer<CChar>?) {
     guard let urlPointer else {
+        kirieLogEntry("kirie_swift_load_url ignored nil pointer")
         return
     }
 
     let url = String(cString: urlPointer)
+    kirieLogEntry("kirie_swift_load_url url=\(url)")
     DispatchQueue.main.async {
         KirieManager.shared.loadURL(url)
     }
@@ -45,11 +51,13 @@ public func kirie_swift_load_url(_ urlPointer: UnsafePointer<CChar>?) {
 @_cdecl("kirie_swift_load_html_string")
 public func kirie_swift_load_html_string(_ htmlPointer: UnsafePointer<CChar>?, _ baseURLPointer: UnsafePointer<CChar>?) {
     guard let htmlPointer else {
+        kirieLogEntry("kirie_swift_load_html_string ignored nil html pointer")
         return
     }
 
     let html = String(cString: htmlPointer)
     let baseURL = baseURLPointer.map { String(cString: $0) }
+    kirieLogEntry("kirie_swift_load_html_string bytes=\(html.utf8.count) baseURL=\(baseURL ?? "<nil>")")
 
     DispatchQueue.main.async {
         KirieManager.shared.loadHTMLString(html, baseURLString: baseURL?.isEmpty == true ? nil : baseURL)
@@ -59,11 +67,17 @@ public func kirie_swift_load_html_string(_ htmlPointer: UnsafePointer<CChar>?, _
 @_cdecl("kirie_swift_send_ipc_message")
 public func kirie_swift_send_ipc_message(_ messageJSONPointer: UnsafePointer<CChar>?) {
     guard let messageJSONPointer else {
+        kirieLogEntry("kirie_swift_send_ipc_message ignored nil pointer")
         return
     }
 
     let messageJSON = String(cString: messageJSONPointer)
+    kirieLogEntry("kirie_swift_send_ipc_message message=\(messageJSON)")
     DispatchQueue.main.async {
         KirieManager.shared.sendIpcMessage(messageJSON)
     }
+}
+
+private func kirieLogEntry(_ message: String) {
+    NSLog("[Kirie][entry] %@", message)
 }

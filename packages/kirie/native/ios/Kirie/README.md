@@ -9,6 +9,14 @@ This directory contains the native iOS implementation for `Kirie`, the first-pas
 - Creates a transparent full-screen `WKWebView` through `createWebView`.
 - Bridges IPC with `window.webkit.messageHandlers.kirie.postMessage(...)` and
   `kirie:ipc-message` DOM events.
+- Resolves `res://` web URLs to files exported into the app bundle and loads
+  them with `WKWebView.loadFileURL(_:allowingReadAccessTo:)`.
+
+`res://` loading is intentionally limited to packaged application bundle
+resources. For example, `res://web/index.html` loads `web/index.html` from the
+app bundle, and `res://web` resolves to `web/index.html`. Runtime-mounted Godot
+packs are not part of this path. `http://`, `https://`, and `file://` URLs keep
+the default `WKWebView` loading behavior.
 
 ## Tooling
 

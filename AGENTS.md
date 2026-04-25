@@ -149,6 +149,9 @@ configured yet.
   soon as practical.
 - When changing iOS bridge code, validate the Godot-to-native-to-web path as
   soon as practical.
+- After changing iOS native code under `packages/kirie/native/ios`, always run
+  `scripts/build_kirie_ios.sh` so `examples/basic-ipc/ios/plugins/kirie/Kirie.xcframework`
+  is refreshed before any device testing.
 - When changing the IPC shape, make sure at least one real request/response
   round-trip remains covered by the example.
 

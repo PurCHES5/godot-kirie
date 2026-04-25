@@ -2,6 +2,7 @@
 extends EditorExportPlugin
 
 const PLUGIN_NAME := "Kirie"
+const DEFAULT_WEB_ROOT := "res://web"
 
 
 func _get_name() -> String:
@@ -9,7 +10,19 @@ func _get_name() -> String:
 
 
 func _supports_platform(platform: EditorExportPlatform) -> bool:
-	return platform is EditorExportPlatformAndroid
+	return platform is EditorExportPlatformAndroid or platform is EditorExportPlatformIOS
+
+
+func _export_begin(
+	features: PackedStringArray,
+	_is_debug: bool,
+	_path: String,
+	_flags: int
+) -> void:
+	if not features.has("ios"):
+		return
+
+	_add_ios_web_bundle_files(DEFAULT_WEB_ROOT)
 
 
 func _get_android_dependencies(
@@ -35,3 +48,14 @@ func _get_android_libraries(
 		return PackedStringArray(["kirie/libraries/android/Kirie-debug.aar"])
 
 	return PackedStringArray()
+
+
+func _add_ios_web_bundle_files(root_path: String) -> void:
+	if not DirAccess.dir_exists_absolute(root_path):
+		var message := "[Kirie][export] iOS web root not found: %s" % root_path
+		push_error(message)
+		assert(false, message)
+		return
+
+	print("[Kirie][export] add iOS bundle web root: %s" % root_path)
+	add_apple_embedded_platform_bundle_file(root_path)

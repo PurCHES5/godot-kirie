@@ -158,6 +158,7 @@ func _append_log(line: String) -> void:
 		_log_lines.remove_at(0)
 
 	_log_label.text = "Log:\n" + "\n".join(_log_lines)
+	print(line)
 
 
 func _set_status(text: String) -> void:
