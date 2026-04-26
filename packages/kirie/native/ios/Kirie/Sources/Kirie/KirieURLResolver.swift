@@ -2,10 +2,12 @@ import Foundation
 
 struct KirieResolvedURL {
     let url: URL
-    let readAccessURL: URL?
 }
 
 enum KirieURLResolver {
+    static let resourceScheme = "kirie-resource"
+    static let resourceHost = "bundle"
+
     private static let resSchemePrefix = "res://"
 
     static func resolveForWebView(_ urlString: String) throws -> KirieResolvedURL {
@@ -14,10 +16,40 @@ enum KirieURLResolver {
                 throw KirieURLResolverError.invalidURL(urlString)
             }
 
-            return KirieResolvedURL(url: url, readAccessURL: nil)
+            return KirieResolvedURL(url: url)
         }
 
         return try resolveResourceURL(urlString)
+    }
+
+    static func bundleFileURL(forResolvedResourceURL url: URL) throws -> URL {
+        guard resourceScheme == url.scheme?.lowercased(), resourceHost == url.host?.lowercased() else {
+            throw KirieURLResolverError.invalidURL(url.absoluteString)
+        }
+
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            throw KirieURLResolverError.invalidURL(url.absoluteString)
+        }
+
+        let encodedPath = components.percentEncodedPath.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        guard !encodedPath.isEmpty else {
+            throw KirieURLResolverError.emptyResourcePath
+        }
+
+        guard hasValidPercentEncoding(encodedPath) else {
+            throw KirieURLResolverError.invalidPercentEncoding(url.absoluteString)
+        }
+
+        let decodedPath = encodedPath.removingPercentEncoding?.trimmingCharacters(in: CharacterSet(charactersIn: "/")) ?? ""
+        guard !decodedPath.isEmpty else {
+            throw KirieURLResolverError.emptyResourcePath
+        }
+
+        guard !decodedPath.contains("\0"), !containsPathTraversal(decodedPath) else {
+            throw KirieURLResolverError.unsafeResourcePath(url.absoluteString)
+        }
+
+        return try bundleFileURL(forAssetPath: resolveAssetPath(decodedPath))
     }
 
     private static func resolveResourceURL(_ urlString: String) throws -> KirieResolvedURL {
@@ -45,11 +77,45 @@ enum KirieURLResolver {
             throw KirieURLResolverError.unsafeResourcePath(urlString)
         }
 
+        let assetPath = resolveAssetPath(decodedPath)
+        _ = try bundleFileURL(forAssetPath: assetPath)
+
+        var components = URLComponents()
+        components.scheme = resourceScheme
+        components.host = resourceHost
+        components.path = "/" + assetPath
+        try applyQueryAndFragment(queryAndFragment, to: &components)
+
+        guard let url = components.url else {
+            throw KirieURLResolverError.invalidURL(urlString)
+        }
+
+        return KirieResolvedURL(url: url)
+    }
+
+    private static func applyQueryAndFragment(_ queryAndFragment: String, to components: inout URLComponents) throws {
+        guard !queryAndFragment.isEmpty else {
+            return
+        }
+
+        if queryAndFragment.hasPrefix("?") {
+            let tail = queryAndFragment.dropFirst()
+            if let fragmentStart = tail.firstIndex(of: "#") {
+                components.percentEncodedQuery = String(tail[..<fragmentStart])
+                components.percentEncodedFragment = String(tail[tail.index(after: fragmentStart)...])
+            } else {
+                components.percentEncodedQuery = String(tail)
+            }
+        } else if queryAndFragment.hasPrefix("#") {
+            components.percentEncodedFragment = String(queryAndFragment.dropFirst())
+        }
+    }
+
+    private static func bundleFileURL(forAssetPath assetPath: String) throws -> URL {
         guard let bundleResourceURL = Bundle.main.resourceURL else {
             throw KirieURLResolverError.missingBundleResourceURL
         }
 
-        let assetPath = resolveAssetPath(decodedPath)
         let candidates = resourceCandidates(for: assetPath, bundleResourceURL: bundleResourceURL)
         guard let resolvedResource = candidates.first(where: { FileManager.default.fileExists(atPath: $0.fileURL.path) }) else {
             throw KirieURLResolverError.resourceNotFound(
@@ -58,44 +124,7 @@ enum KirieURLResolver {
             )
         }
 
-        let navigableURL = try appendQueryAndFragment(queryAndFragment, to: resolvedResource.fileURL)
-        let readAccessURL = readAccessRoot(for: resolvedResource.assetPath, bundleResourceURL: bundleResourceURL)
-        return KirieResolvedURL(url: navigableURL, readAccessURL: readAccessURL)
-    }
-
-    private static func appendQueryAndFragment(_ queryAndFragment: String, to url: URL) throws -> URL {
-        guard !queryAndFragment.isEmpty else {
-            return url
-        }
-
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        if queryAndFragment.hasPrefix("?") {
-            let tail = queryAndFragment.dropFirst()
-            if let fragmentStart = tail.firstIndex(of: "#") {
-                components?.percentEncodedQuery = String(tail[..<fragmentStart])
-                components?.percentEncodedFragment = String(tail[tail.index(after: fragmentStart)...])
-            } else {
-                components?.percentEncodedQuery = String(tail)
-            }
-        } else if queryAndFragment.hasPrefix("#") {
-            components?.percentEncodedFragment = String(queryAndFragment.dropFirst())
-        }
-
-        guard let resolvedURL = components?.url else {
-            throw KirieURLResolverError.invalidURL(url.absoluteString + queryAndFragment)
-        }
-
-        return resolvedURL
-    }
-
-    private static func readAccessRoot(for assetPath: String, bundleResourceURL: URL) -> URL {
-        let segments = assetPath.split(separator: "/", omittingEmptySubsequences: true)
-
-        guard segments.count > 1, let firstSegment = segments.first, !firstSegment.contains(".") else {
-            return bundleResourceURL
-        }
-
-        return bundleResourceURL.appendingPathComponent(String(firstSegment), isDirectory: true)
+        return resolvedResource.fileURL
     }
 
     private static func resourceCandidates(for assetPath: String, bundleResourceURL: URL) -> [KirieBundleResourceCandidate] {

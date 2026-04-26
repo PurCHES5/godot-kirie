@@ -14,6 +14,7 @@ final class KirieManager: NSObject {
 
     private let notificationCenter = NotificationCenter.default
     private let sessionID = UUID().uuidString.lowercased()
+    private let resourceURLSchemeHandler = KirieResourceURLSchemeHandler()
     private var containerView: UIView?
     private var webView: WKWebView?
 
@@ -120,12 +121,6 @@ final class KirieManager: NSObject {
             return
         }
 
-        if let readAccessURL = resolvedURL.readAccessURL {
-            logInfo("Loading file URL: \(resolvedURL.url.absoluteString) readAccess=\(readAccessURL.path)")
-            webView.loadFileURL(resolvedURL.url, allowingReadAccessTo: readAccessURL)
-            return
-        }
-
         logInfo("Loading URL: \(resolvedURL.url.absoluteString)")
         webView.load(URLRequest(url: resolvedURL.url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
     }
@@ -176,6 +171,10 @@ final class KirieManager: NSObject {
         webViewConfiguration.allowsInlineMediaPlayback = true
         webViewConfiguration.defaultWebpagePreferences.allowsContentJavaScript = true
         webViewConfiguration.userContentController = userContentController
+        webViewConfiguration.setURLSchemeHandler(
+            resourceURLSchemeHandler,
+            forURLScheme: KirieURLResolver.resourceScheme
+        )
 
         let webView = WKWebView(frame: .zero, configuration: webViewConfiguration)
         webView.translatesAutoresizingMaskIntoConstraints = false
@@ -185,6 +184,10 @@ final class KirieManager: NSObject {
         webView.scrollView.backgroundColor = .clear
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.accessibilityIdentifier = "KirieWebView"
+
+        if #available(iOS 16.4, *) {
+            webView.isInspectable = true // TODO: read from config
+        }
 
         containerView.addSubview(webView)
         pinToEdges(webView, in: containerView)
