@@ -12,7 +12,6 @@ class KirieWebViewManager(
     private val onIpcMessage: (messageJson: String) -> Unit,
     private val onIpcError: (message: String) -> Unit,
 ) {
-
     private var webView: WebView? = null
 
     fun createWebView(initialUrl: String?) {
@@ -33,15 +32,17 @@ class KirieWebViewManager(
 
             val rootView = activity.findViewById<ViewGroup>(android.R.id.content).rootView as FrameLayout
             val createdWebView = WebView(activity)
-            val javascriptBridge = KirieJavascriptBridge(
-                onIpcMessage = onIpcMessage,
-                onIpcError = onIpcError,
-            )
+            val javascriptBridge =
+                KirieJavascriptBridge(
+                    onIpcMessage = onIpcMessage,
+                    onIpcError = onIpcError,
+                )
 
-            createdWebView.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-            )
+            createdWebView.layoutParams =
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                )
             createdWebView.setBackgroundColor(Color.TRANSPARENT)
             createdWebView.settings.javaScriptEnabled = true
             createdWebView.settings.domStorageEnabled = true
@@ -51,10 +52,11 @@ class KirieWebViewManager(
             }
 
             createdWebView.addJavascriptInterface(javascriptBridge, KirieJavascriptBridge.BRIDGE_NAME)
-            createdWebView.webViewClient = DebugTlsBypassWebViewClient(
-                serverUrl = initialUrl,
-                assetRequestHandler = KirieAssetRequestHandler(activity.assets),
-            )
+            createdWebView.webViewClient =
+                DebugTlsBypassWebViewClient(
+                    serverUrl = initialUrl,
+                    assetRequestHandler = KirieAssetRequestHandler(activity.assets),
+                )
 
             rootView.addView(createdWebView)
             webView = createdWebView
@@ -100,7 +102,10 @@ class KirieWebViewManager(
         }
     }
 
-    fun loadHtmlString(html: String, baseUrl: String?) {
+    fun loadHtmlString(
+        html: String,
+        baseUrl: String?,
+    ) {
         val activity = activityProvider()
         if (activity == null) {
             onIpcError("Cannot load HTML string because the host activity is not available")
@@ -132,9 +137,10 @@ class KirieWebViewManager(
                 return@runOnUiThread
             }
 
-            val script = """
+            val script =
+                """
                 window.dispatchEvent(new CustomEvent("kirie:ipc-message", { detail: $messageJson }));
-            """.trimIndent()
+                """.trimIndent()
 
             existingWebView.evaluateJavascript(script, null)
         }
@@ -145,13 +151,17 @@ class KirieWebViewManager(
         activity.runOnUiThread(block)
     }
 
-    private fun loadResolvedUrl(webView: WebView, url: String) {
-        val resolvedUrl = try {
-            KirieUrlResolver.resolveForWebView(url)
-        } catch (error: IllegalArgumentException) {
-            onIpcError(error.message ?: "Cannot load URL: $url")
-            return
-        }
+    private fun loadResolvedUrl(
+        webView: WebView,
+        url: String,
+    ) {
+        val resolvedUrl =
+            try {
+                KirieUrlResolver.resolveForWebView(url)
+            } catch (error: IllegalArgumentException) {
+                onIpcError(error.message ?: "Cannot load URL: $url")
+                return
+            }
 
         webView.loadUrl(resolvedUrl)
     }

@@ -31,10 +31,9 @@ object KirieUrlResolver {
         return KIRIE_ASSET_BASE_URL + Uri.encode(assetPath, "/") + queryAndFragment
     }
 
-    fun isResolvedAssetUrl(uri: Uri): Boolean {
-        return KIRIE_ASSET_SCHEME.equals(uri.scheme, ignoreCase = true) &&
+    fun isResolvedAssetUrl(uri: Uri): Boolean =
+        KIRIE_ASSET_SCHEME.equals(uri.scheme, ignoreCase = true) &&
             KIRIE_ASSET_HOST.equals(uri.host, ignoreCase = true)
-    }
 
     fun assetPathFromResolvedUrl(uri: Uri): String {
         require(isResolvedAssetUrl(uri)) { "Not a Kirie asset URL: $uri" }
@@ -74,7 +73,8 @@ object KirieUrlResolver {
     }
 
     private fun containsPathTraversal(path: String): Boolean =
-        path.replace('\\', '/')
+        path
+            .replace('\\', '/')
             .split('/')
             .any { segment -> segment == ".." }
 
@@ -89,6 +89,5 @@ object KirieUrlResolver {
         }
     }
 
-    private fun Char.isHexDigit(): Boolean =
-        this in '0'..'9' || this in 'a'..'f' || this in 'A'..'F'
+    private fun Char.isHexDigit(): Boolean = this in '0'..'9' || this in 'a'..'f' || this in 'A'..'F'
 }

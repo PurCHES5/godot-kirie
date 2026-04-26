@@ -96,6 +96,21 @@ that is deferred work and should not complicate the current IPC milestone.
 - When adding agent-facing guidance, prefer `AGENTS.md` and repo-local skills
   over ad hoc note files.
 
+## Tooling
+
+- Project development tools are managed by mise. Run repository commands
+  through `mise x -- <command>` unless the shell has already activated mise.
+- Install or refresh tools with `mise install`.
+- pnpm is managed by Node Corepack and the root `packageManager` field, not by
+  mise. Prefer `mise x -- corepack pnpm ...` for package scripts.
+- Godot editor is managed by mise through the project `godot` tool. Use
+  `mise x -- godot ...`; use `mise which godot` when a direct executable path is
+  needed.
+- Keep Gradle wrapper and Xcode usage as-is; mise only provides the Java runtime
+  and command-line tools around them.
+- Do not use GodotEnv or vfox for this repository unless a task explicitly asks
+  to compare or repair those flows.
+
 ## Engineering Rules
 
 These rules are intended to guide future work even when the full tooling is not
@@ -145,6 +160,18 @@ configured yet.
 ### Validation
 
 - Prefer validating through `examples/basic-ipc`.
+- Run the relevant lint target through mise after changing a covered language:
+  - GDScript: `mise x -- corepack pnpm run lint:gdscript`
+  - TypeScript, JSON, CSS, and HTML: `mise x -- corepack pnpm run lint:biome`
+  - Kotlin and Gradle Kotlin DSL: `mise x -- corepack pnpm run lint:kotlin`
+  - Swift: `mise x -- corepack pnpm run lint:swift`
+- Run `mise x -- corepack pnpm run lint` when changes span multiple covered
+  languages or before finalizing broad changes.
+- Use the matching format target when making style-only fixes:
+  `mise x -- corepack pnpm run format:gdscript`,
+  `mise x -- corepack pnpm run format:biome`,
+  `mise x -- corepack pnpm run format:kotlin`, or
+  `mise x -- corepack pnpm run format:swift`.
 - When changing Android bridge code, validate the Godot-to-native-to-web path as
   soon as practical.
 - When changing iOS bridge code, validate the Godot-to-native-to-web path as
@@ -201,8 +228,6 @@ The following directions are intentional, but they are not fully set up in the
 repository yet. Agents should treat them as targets, not as already-enforced
 infrastructure.
 
-- Linter and formatter configuration is not complete yet for GDScript,
-  TypeScript, Kotlin, or Swift.
 - GitHub Actions are not configured yet for lint, build, or example smoke
   checks.
 - Code generation pipelines for future C# wrappers or shared API declarations do

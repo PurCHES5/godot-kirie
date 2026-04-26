@@ -13,7 +13,10 @@ class DebugTlsBypassWebViewClient(
     private val serverUrl: String?,
     private val assetRequestHandler: KirieAssetRequestHandler,
 ) : WebViewClient() {
-    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+    override fun shouldInterceptRequest(
+        view: WebView,
+        request: WebResourceRequest,
+    ): WebResourceResponse? {
         if (!KirieUrlResolver.isResolvedAssetUrl(request.url)) {
             return null
         }
@@ -64,21 +67,37 @@ class DebugTlsBypassWebViewClient(
         return isLocalDevelopmentHost(errorUri.host)
     }
 
-    private fun isLocalDevelopmentHost(host: String?): Boolean {
-        return if (host.isNullOrBlank()) {
+    private fun isLocalDevelopmentHost(host: String?): Boolean =
+        if (host.isNullOrBlank()) {
             false
-        } else when {
-            host.equals("localhost", ignoreCase = true) -> true
-            host == "127.0.0.1" || host == "10.0.2.2" || host == "10.0.3.2" || host == "::1" -> true
-            host.endsWith(".local") -> true
-            host.startsWith("10.") || host.startsWith("192.168.") -> true
-            host.startsWith("172.") -> {
-                val secondOctet = host.split('.').getOrNull(1)?.toIntOrNull()
-                secondOctet in 16..31
+        } else {
+            when {
+                host.equals("localhost", ignoreCase = true) -> {
+                    true
+                }
+
+                host == "127.0.0.1" || host == "10.0.2.2" || host == "10.0.3.2" || host == "::1" -> {
+                    true
+                }
+
+                host.endsWith(".local") -> {
+                    true
+                }
+
+                host.startsWith("10.") || host.startsWith("192.168.") -> {
+                    true
+                }
+
+                host.startsWith("172.") -> {
+                    val secondOctet = host.split('.').getOrNull(1)?.toIntOrNull()
+                    secondOctet in 16..31
+                }
+
+                else -> {
+                    false
+                }
             }
-            else -> false
         }
-    }
 
     private fun normalizePort(uri: Uri): Int {
         val port = uri.port

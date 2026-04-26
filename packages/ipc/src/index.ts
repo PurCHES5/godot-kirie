@@ -25,7 +25,9 @@ export type KirieIpcMessageHandler<TMessage = unknown> = (message: TMessage) => 
 export function sendIpcMessage(message: unknown): void {
   const messageJson = JSON.stringify(message);
   if (messageJson === undefined) {
-    throw new TypeError("Kirie IPC message root must serialize to a JSON string. See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description for details.");
+    throw new TypeError(
+      "Kirie IPC message root must serialize to a JSON string. See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description for details.",
+    );
   }
 
   const androidBridge = globalThis.KirieAndroidBridge;

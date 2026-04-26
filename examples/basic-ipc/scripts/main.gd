@@ -9,14 +9,14 @@ const DEFAULT_OUTBOUND_MESSAGE := {
 const PAGE_URL := "res://web/dist/index.html"
 const PROBE_PAGE_URL := "res://web/dist/index.html?mode=probe"
 
-@onready var _url_input: LineEdit = $VBoxContainer/UrlInput
-@onready var _status_label: Label = $VBoxContainer/StatusLabel
-@onready var _log_label: Label = $VBoxContainer/LogLabel
-
 var _kirie := GdKirie.new()
 var _log_lines: PackedStringArray = PackedStringArray()
 var _probe_pending := false
 var _webview_is_ready := false
+
+@onready var _url_input: LineEdit = $VBoxContainer/UrlInput
+@onready var _status_label: Label = $VBoxContainer/StatusLabel
+@onready var _log_label: Label = $VBoxContainer/LogLabel
 
 
 func _ready() -> void:

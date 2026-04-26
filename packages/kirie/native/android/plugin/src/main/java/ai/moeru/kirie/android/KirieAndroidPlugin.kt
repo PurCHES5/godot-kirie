@@ -6,8 +6,9 @@ import org.godotengine.godot.plugin.GodotPlugin
 import org.godotengine.godot.plugin.SignalInfo
 import org.godotengine.godot.plugin.UsedByGodot
 
-class KirieAndroidPlugin(godot: Godot) : GodotPlugin(godot) {
-
+class KirieAndroidPlugin(
+    godot: Godot,
+) : GodotPlugin(godot) {
     private val webViewManager by lazy {
         KirieWebViewManager(
             activityProvider = { activity },
@@ -19,13 +20,12 @@ class KirieAndroidPlugin(godot: Godot) : GodotPlugin(godot) {
 
     override fun getPluginName(): String = BuildConfig.GODOT_PLUGIN_NAME
 
-    override fun getPluginSignals(): Set<SignalInfo> {
-        return setOf(
+    override fun getPluginSignals(): Set<SignalInfo> =
+        setOf(
             SIGNAL_WEBVIEW_READY,
             SIGNAL_IPC_MESSAGE_RECEIVED,
             SIGNAL_IPC_ERROR,
         )
-    }
 
     @UsedByGodot
     fun createWebView(initialUrl: String) {
@@ -43,7 +43,10 @@ class KirieAndroidPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     @UsedByGodot
-    fun loadHtmlString(html: String, baseUrl: String) {
+    fun loadHtmlString(
+        html: String,
+        baseUrl: String,
+    ) {
         webViewManager.loadHtmlString(html, baseUrl.ifBlank { null })
     }
 

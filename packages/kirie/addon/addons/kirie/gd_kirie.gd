@@ -1,11 +1,11 @@
 class_name GdKirie
 extends Object
 
-const PLUGIN_SINGLETON_NAME := "Kirie"
-
 signal webview_ready()
 signal ipc_message_received(message: Variant)
 signal ipc_error(error: String)
+
+const PLUGIN_SINGLETON_NAME := "Kirie"
 
 var _plugin_singleton = null
 

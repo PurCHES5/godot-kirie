@@ -6,7 +6,6 @@ class KirieJavascriptBridge(
     private val onIpcMessage: (messageJson: String) -> Unit,
     private val onIpcError: (message: String) -> Unit,
 ) {
-
     @JavascriptInterface
     fun postMessage(messageJson: String?) {
         if (messageJson == null) {

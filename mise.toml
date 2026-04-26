@@ -1,0 +1,16 @@
+[settings]
+lockfile = true
+legacy_version_file = false
+
+[tool_alias]
+godot = "asdf:mkungla/asdf-godot"
+
+[tools]
+godot = "4.6.2-stable"
+node = "24.14.1"
+python = "3.13.13"
+uv = "0.11.7"
+java = "21"
+ktlint = "1.8.0"
+swiftlint = "0.62.2"
+"pipx:gdtoolkit" = "4.5.0"

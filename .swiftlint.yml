@@ -1,0 +1,23 @@
+included:
+  - packages/kirie/native/ios/Kirie/Sources/Kirie
+
+excluded:
+  - packages/kirie/native/ios/Kirie/Sources/Kirie/KirieBridge.mm
+  - packages/kirie/native/ios/Kirie/Sources/Kirie/KiriePlugin.h
+  - packages/kirie/native/ios/Kirie/Sources/Kirie/KiriePlugin.mm
+
+disabled_rules:
+  - trailing_comma
+  - todo
+
+line_length:
+  warning: 140
+  error: 200
+
+function_body_length:
+  warning: 80
+  error: 120
+
+type_body_length:
+  warning: 300
+  error: 500

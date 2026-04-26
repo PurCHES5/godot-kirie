@@ -4,6 +4,19 @@
   "packageManager": "pnpm@10.18.0",
   "scripts": {
     "build": "pnpm -r run build",
+    "format": "pnpm run format:biome && pnpm run format:gdscript && pnpm run format:kotlin && pnpm run format:swift",
+    "format:biome": "biome check --write .",
+    "format:gdscript": "gdformat packages/kirie/addon/addons/kirie examples/basic-ipc/scripts",
+    "format:kotlin": "ktlint --format \"packages/kirie/native/android/**/*.kt\" \"packages/kirie/native/android/**/*.kts\"",
+    "format:swift": "swiftlint lint --fix --format --no-cache --config .swiftlint.yml",
+    "lint": "pnpm run lint:biome && pnpm run lint:gdscript && pnpm run lint:kotlin && pnpm run lint:swift",
+    "lint:biome": "biome check .",
+    "lint:gdscript": "gdlint packages/kirie/addon/addons/kirie examples/basic-ipc/scripts",
+    "lint:kotlin": "ktlint \"packages/kirie/native/android/**/*.kt\" \"packages/kirie/native/android/**/*.kts\"",
+    "lint:swift": "swiftlint lint --strict --no-cache --config .swiftlint.yml",
     "typecheck": "pnpm -r run typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.4"
   }
 }

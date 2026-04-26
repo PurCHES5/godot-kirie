@@ -129,7 +129,10 @@ enum KirieURLResolver {
 
     private static func resourceCandidates(for assetPath: String, bundleResourceURL: URL) -> [KirieBundleResourceCandidate] {
         var candidates = [
-            KirieBundleResourceCandidate(assetPath: assetPath, fileURL: bundleResourceURL.appendingPathComponent(assetPath, isDirectory: false)),
+            KirieBundleResourceCandidate(
+                assetPath: assetPath,
+                fileURL: bundleResourceURL.appendingPathComponent(assetPath, isDirectory: false)
+            ),
         ]
 
         if assetPath.hasPrefix("web/") {
@@ -226,7 +229,8 @@ enum KirieURLResolverError: LocalizedError {
         case .missingBundleResourceURL:
             return "Cannot load res:// URL because the app bundle resource URL is unavailable"
         case let .resourceNotFound(assetPath, candidates):
-            return "Cannot load res:// asset because it was not found in the app bundle: \(assetPath); checked \(candidates.joined(separator: ", "))"
+            return "Cannot load res:// asset because it was not found in the app bundle: \(assetPath); "
+                + "checked \(candidates.joined(separator: ", "))"
         case let .unsafeResourcePath(url):
             return "Cannot load unsafe res:// asset path: \(url)"
         }
