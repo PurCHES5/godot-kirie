@@ -11,8 +11,8 @@ It is intentionally small and focuses on one path:
 
 The example now supports two ways to exercise that path:
 
-1. a manual remote page loaded from `web/index.html`
-2. the local probe page loaded through `load_html_string()`
+1. a manual remote page served by the Vite dev server
+2. the local probe page loaded from the built `res://web/dist/index.html`
 
 ## Layout
 
@@ -22,33 +22,37 @@ The example now supports two ways to exercise that path:
   the main test scene
 - `scripts/main.gd`
   the scene logic
-- `web/index.html`
-  a tiny page for WebView IPC testing
+- `web`
+  a small Vite app for WebView IPC testing
 
 ## Running the web side
 
-Serve the `web/` directory with any simple static server and use that URL in the
-project UI.
+Run the Vite dev server and use that URL in the project UI.
 
 Example:
 
 ```sh
-cd examples/basic-ipc/web
-python3 -m http.server 8000
+pnpm --filter @kirie/basic-ipc-web run dev
 ```
 
 Then open the Godot project and use:
 
-`http://10.0.2.2:8000/`
+`http://10.0.2.2:5173/`
 
 for an Android emulator, or an appropriate LAN/local address for a device.
 
 ## Running the inline probe
 
+Build the web app first:
+
+```sh
+pnpm --filter @kirie/basic-ipc-web run build
+```
+
 Open the Godot project and press `Run Probe`.
 
-This creates a WebView if needed, reads `res://web/index.html`, loads it through
-`load_html_string()`, and performs a minimal round-trip:
+This creates a WebView if needed, loads
+`res://web/dist/index.html?mode=probe`, and performs a minimal round-trip:
 
 1. probe sends `web_ready`
 2. Godot replies with `godot_ready`

@@ -6,9 +6,8 @@ const DEFAULT_OUTBOUND_MESSAGE := {
 		"source": "godot",
 	},
 }
-const PROBE_BASE_URL := "https://kirie.test/"
-const PAGE_HTML_PATH := "res://web/index.html"
-const PROBE_MODE_SCRIPT := "<script>globalThis.__KIRIE_MODE__ = \"probe\";</script>"
+const PAGE_URL := "res://web/dist/index.html"
+const PROBE_PAGE_URL := "res://web/dist/index.html?mode=probe"
 
 @onready var _url_input: LineEdit = $VBoxContainer/UrlInput
 @onready var _status_label: Label = $VBoxContainer/StatusLabel
@@ -55,7 +54,7 @@ func _on_probe_button_pressed() -> void:
 	_append_log("run_probe")
 
 	if _webview_is_ready:
-		_load_probe_html()
+		_load_probe_page()
 		return
 
 	_kirie.create_webview()
@@ -82,7 +81,7 @@ func _on_webview_ready() -> void:
 	_append_log("signal webview_ready")
 
 	if _probe_pending:
-		_load_probe_html()
+		_load_probe_page()
 
 
 func _on_ipc_message_received(message: Variant) -> void:
@@ -108,6 +107,7 @@ func _on_ipc_message_received(message: Variant) -> void:
 
 
 func _on_ipc_error(error: String) -> void:
+	_probe_pending = false
 	_set_status("Status: IPC error")
 	_append_log("signal ipc_error %s" % error)
 
@@ -120,36 +120,10 @@ func _send_test_message() -> void:
 	_kirie.send_ipc_message(DEFAULT_OUTBOUND_MESSAGE)
 
 
-func _load_probe_html() -> void:
-	var page_html := _build_probe_html()
-	if page_html.is_empty():
-		return
-
-	_probe_pending = false
-	_set_status("Status: loading probe HTML")
-	_append_log("load_html_string probe")
-	_kirie.load_html_string(page_html, PROBE_BASE_URL)
-
-
-func _build_probe_html() -> String:
-	var html_file := FileAccess.open(PAGE_HTML_PATH, FileAccess.READ)
-	if html_file == null:
-		var error := "Failed to open %s" % PAGE_HTML_PATH
-		_set_status("Status: probe failed")
-		_append_log(error)
-		return ""
-
-	var html := html_file.get_as_text()
-	if html.is_empty():
-		var error := "Probe page is empty: %s" % PAGE_HTML_PATH
-		_set_status("Status: probe failed")
-		_append_log(error)
-		return ""
-
-	if html.contains("</head>"):
-		return html.replace("</head>", "%s\n</head>" % PROBE_MODE_SCRIPT)
-
-	return "%s\n%s" % [PROBE_MODE_SCRIPT, html]
+func _load_probe_page() -> void:
+	_set_status("Status: loading probe page")
+	_append_log("load_url %s" % PROBE_PAGE_URL)
+	_kirie.load_url(PROBE_PAGE_URL)
 
 
 func _append_log(line: String) -> void:
