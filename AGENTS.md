@@ -161,6 +161,9 @@ configured yet.
   additions.
 - Do not add a new dependency unless it materially reduces risk or complexity
   for the current milestone.
+- When adding or upgrading dependencies, prefer the latest stable/current
+  versions unless the repository, platform, or compatibility target requires an
+  older version.
 - Keep JavaScript-side dependencies light until the IPC model and plugin shape
   are stable.
 
