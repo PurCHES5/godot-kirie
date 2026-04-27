@@ -1,0 +1,61 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Linters
+    runs-on: ubuntu-latest
+    env:
+      MISE_EXEC_AUTO_INSTALL: "false"
+      MISE_NOT_FOUND_AUTO_INSTALL: "false"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install project tools
+        uses: jdx/mise-action@v3
+        with:
+          install: true
+          cache: true
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "path=$(mise x -- corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install pnpm dependencies
+        run: mise x -- corepack pnpm install --frozen-lockfile
+
+      - name: Run Biome
+        run: mise x -- corepack pnpm run lint:biome
+
+      - name: Run GDScript lint
+        run: mise x -- corepack pnpm run lint:gdscript
+
+      - name: Run Kotlin lint
+        run: mise x -- corepack pnpm run lint:kotlin
+
+      - name: Run SwiftLint
+        uses: docker://ghcr.io/realm/swiftlint:0.62.2
+        with:
+          args: lint --strict --no-cache --config .swiftlint.yml
