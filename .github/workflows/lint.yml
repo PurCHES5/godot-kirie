@@ -32,6 +32,9 @@ jobs:
           install_args: node python java ktlint swiftlint pipx:gdtoolkit
           cache: true
 
+      - name: Enable Corepack
+        run: mise x -- corepack enable pnpm
+
       - name: Get pnpm store path
         id: pnpm-store
         run: echo "path=$(mise x -- corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
