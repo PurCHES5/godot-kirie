@@ -1,0 +1,85 @@
+name: Android Platform Integration
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+    env:
+      MISE_EXEC_AUTO_INSTALL: "false"
+      MISE_NOT_FOUND_AUTO_INSTALL: "false"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Node and Java
+        uses: jdx/mise-action@v3
+        with:
+          install: true
+          install_args: node java
+          cache: true
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.6.2
+          use-dotnet: true
+          include-templates: true
+
+      - name: Enable Corepack
+        run: mise x -- corepack enable pnpm
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "path=$(mise x -- corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-${{ runner.arch }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-pnpm-store-
+
+      - name: Install pnpm dependencies
+        run: mise x -- corepack pnpm install --frozen-lockfile
+
+      - name: Install Android SDK platforms
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platforms;android-35" "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+
+      - name: Build integration APK
+        run: mise x -- bash -c 'GODOT_BIN="${GODOT:-godot}" scripts/build_integration_android.sh'
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run integration tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          script: |
+            adb install -r dist/integration/android_debug.apk
+            scripts/run_integration_android_test.sh ipc_round_trip_probe
+            scripts/run_integration_android_test.sh webview_lifecycle_probe
+            scripts/run_integration_android_test.sh res_asset_loading_probe
