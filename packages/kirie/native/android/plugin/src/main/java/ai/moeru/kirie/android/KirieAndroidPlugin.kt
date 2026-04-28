@@ -55,6 +55,9 @@ class KirieAndroidPlugin(
         webViewManager.sendIpcMessage(messageJson)
     }
 
+    @UsedByGodot
+    fun getLaunchOption(key: String): String = activity?.intent?.getStringExtra(key).orEmpty()
+
     private fun handleWebViewReady() {
         emitSignal(SIGNAL_WEBVIEW_READY)
     }

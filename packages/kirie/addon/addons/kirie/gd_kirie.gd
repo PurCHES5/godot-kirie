@@ -65,6 +65,15 @@ func send_ipc_message(message: Variant) -> void:
 	_plugin_singleton.sendIpcMessage(message_json)
 
 
+func get_launch_option(key: String) -> String:
+	if not _ensure_plugin_singleton("get_launch_option"):
+		return ""
+
+	var value := str(_plugin_singleton.getLaunchOption(key))
+	print("[Kirie][gd] get_launch_option key=%s value=%s" % [key, value])
+	return value
+
+
 func is_available() -> bool:
 	return _plugin_singleton != null
 
