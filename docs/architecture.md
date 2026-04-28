@@ -7,7 +7,7 @@ We are standardizing only the minimum plugin shape needed to support:
 - a Godot-facing Kirie service
 - a scene-friendly KirieView node
 - Android and iOS native WebView implementations
-- an example project used for integration testing
+- a repo-level platform integration test project
 
 Anything beyond that, such as dedicated protocol packages, CLI tooling, or
 adapters, is deferred until the IPC model is proven.
