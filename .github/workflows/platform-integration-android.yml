@@ -39,6 +39,15 @@ jobs:
           use-dotnet: true
           include-templates: true
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: >-
+            platform-tools
+            platforms;android-35
+            platforms;android-36
+            build-tools;36.0.0
+
       - name: Enable Corepack
         run: mise x -- corepack enable pnpm
 
@@ -56,11 +65,6 @@ jobs:
 
       - name: Install pnpm dependencies
         run: mise x -- corepack pnpm install --frozen-lockfile
-
-      - name: Install Android SDK platforms
-        run: |
-          yes | sdkmanager --licenses >/dev/null
-          sdkmanager "platforms;android-35" "platforms;android-36" "build-tools;36.0.0" "platform-tools"
 
       - name: Build integration APK
         run: mise x -- bash -c 'GODOT_BIN="${GODOT:-godot}" scripts/build_integration_android.sh'
