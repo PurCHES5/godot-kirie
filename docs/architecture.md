@@ -7,15 +7,13 @@ We are standardizing only the minimum plugin shape needed to support:
 - a Godot-facing Kirie service
 - a scene-friendly KirieView node
 - Android and iOS native WebView implementations
+- packaged `res://` web resource loading for exported apps
 - a repo-level platform integration test project
 
-Anything beyond that, such as dedicated protocol packages, CLI tooling, or
-adapters, is deferred until the IPC model is proven.
-
-This also includes a future browser-facing SDK layer. A minimal
-`KirieIpcBridge` may later provide a platform-neutral JavaScript entry point on
-top of the native transport, but it is not part of the current IPC bring-up
-scope.
+Anything beyond that, such as CLI tooling, app-level event adapters, or
+invocation APIs, is deferred until the IPC model is proven. The current
+`@kirie/ipc` package is intentionally only a browser-side transport wrapper on
+top of the raw native bridge.
 
 ## Deferred debugging and automation direction
 
@@ -55,14 +53,16 @@ automation interfaces.
 
 Higher-level semantics such as event routing, richer message contracts, or
 request/response abstractions are expected to live above this layer, for example
-in future adapters such as `eventa` or a browser-facing `KirieIpcBridge` SDK.
+in future app-specific adapters above Kirie or `@kirie/ipc`.
 
 Current public Godot-facing names should stay close to that low-level role:
 
 - `create_webview(options := {})`
 - `destroy_webview()`
 - `load_url(url)`
+- `load_html_string(html, base_url := "")`
 - `send_ipc_message(message)`
+- `get_launch_option(key)`
 
 The Godot-facing `Kirie` script is expected to stay a thin wrapper over the
 platform singleton, keeping naming and serialization concerns on the Godot side
@@ -81,8 +81,8 @@ For the current milestone, Kirie intentionally supports a single active WebView.
 Multi-WebView support is deferred until the single-WebView bridge is working end
 to end.
 
-Kirie is also expected to support loading offline web content from Godot project
-resources in the future, including content authored under `res://`.
+Kirie supports loading packaged offline web content from Godot project resources
+through the `res://web` path described below.
 
 ## Packaged web resource loading
 

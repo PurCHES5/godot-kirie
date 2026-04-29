@@ -9,14 +9,14 @@ The current milestone is limited to:
 
 1. create a platform WebView
 2. establish bidirectional IPC between Godot and the WebView
-3. stabilize the Kirie plugin shape before adding larger tooling layers
+3. support packaged `res://` web content loading enough for bridge tests
+4. stabilize the Kirie plugin shape before adding larger tooling layers
 
 Do not introduce extra packages, adapters, or CLI workflows unless they are
-required to make the current IPC milestone work.
-
-A future browser-facing `KirieIpcBridge` SDK is allowed as a follow-up layer,
-but it is not part of the current milestone unless the user explicitly asks for
-it.
+required to make the current IPC milestone work. The existing `@kirie/ipc`
+package is a thin browser-side transport wrapper; do not expand it into an
+application event or invocation layer unless the user explicitly asks for that
+higher-level work.
 
 ## Repository Layout
 
@@ -27,8 +27,16 @@ it.
   Kotlin Android implementation
 - `packages/kirie/native/ios`
   Swift iOS implementation
+- `packages/ipc`
+  thin browser-side IPC transport wrapper for WebView pages
 - `examples/basic-ipc`
-  the first integration and regression target
+  the first runnable manual integration target
+- `tests/integration`
+  exported-app platform bridge regression target
+- `scripts`
+  local build and run helpers for Android and iOS validation
+- `.codex/skills`
+  repo-local Codex skills for project maintenance workflows
 - `docs`
   lightweight architecture notes
 
@@ -36,6 +44,12 @@ it.
 
 Prefer the official references collected in `docs/references.md` before relying
 on memory for Godot plugin APIs or platform WebView behavior.
+
+When proposing or adopting a technical approach, cite at least one relevant
+source: official documentation, the upstream GitHub repository, or a relevant
+community discussion. Prefer official documentation or upstream repositories for
+API and compatibility decisions. Treat community comments as supplemental and
+label them as anecdotal when they influence a decision.
 
 ## Design Constraints
 
@@ -47,14 +61,16 @@ on memory for Godot plugin APIs or platform WebView behavior.
   application event layer.
 - Defer higher-level semantics such as invocation APIs and richer event models
   to layers above `kirie`, such as future adapters.
-- Defer browser-side convenience wrappers such as `KirieIpcBridge` until after
-  the native IPC path is working end to end.
+- Keep `@kirie/ipc` as a thin browser-side transport wrapper around the raw
+  native bridge. Defer richer browser SDKs until there is a real app-level use
+  case.
 - For the current milestone, assume a single active WebView unless the user
   explicitly asks to reintroduce multi-WebView behavior.
 - Keep the Godot-facing wrapper thin; prefer forwarding to the platform
   singleton over reimplementing platform lifecycle logic in GDScript.
-- Keep in mind that Kirie is expected to support offline web content sourced
-  from project resources, including future `res://`-based loading flows.
+- Kirie supports packaged web content sourced from project resources through
+  `res://web` loading on the current native paths. Runtime-mounted Godot packs
+  remain out of scope for that loading path.
 - If an API is needed by both GDScript and C#, define the shape once and keep
   C# as a thin wrapper.
 
@@ -89,8 +105,11 @@ that is deferred work and should not complicate the current IPC milestone.
 ## Working Style
 
 - Keep changes aligned with the current milestone.
+- Use English only for agent-facing communication, project-maintenance notes,
+  AGENTS updates, and project documentation unless the user explicitly requests
+  a non-English artifact.
 - Favor small, testable steps that can be exercised through
-  `examples/basic-ipc`.
+  `examples/basic-ipc` or `tests/integration`.
 - When touching native code, keep the Godot-facing API stable unless there is a
   strong reason to change it.
 - When adding agent-facing guidance, prefer `AGENTS.md` and repo-local skills
@@ -160,7 +179,8 @@ configured yet.
 
 ### Validation
 
-- Prefer validating through `examples/basic-ipc`.
+- Use `examples/basic-ipc` for manual smoke validation and `tests/integration`
+  for exported-app platform bridge regressions.
 - Run the relevant lint target through mise after changing a covered language:
   - GDScript: `mise x -- corepack pnpm run lint:gdscript`
   - TypeScript, JSON, CSS, and HTML: `mise x -- corepack pnpm run lint:biome`
@@ -181,7 +201,7 @@ configured yet.
   `scripts/build_kirie_ios.sh` so `examples/basic-ipc/ios/plugins/kirie/Kirie.xcframework`
   is refreshed before any device testing.
 - When changing the IPC shape, make sure at least one real request/response
-  round-trip remains covered by the example.
+  round-trip remains covered by the example or integration tests.
 
 ### Dependencies
 
@@ -233,11 +253,9 @@ infrastructure.
   checks.
 - Code generation pipelines for future C# wrappers or shared API declarations do
   not exist yet.
-- A browser-facing `KirieIpcBridge` SDK shape is being considered for future
-  cross-platform web usage, but it is not implemented yet.
+- Richer app-level adapters or invocation APIs above `@kirie/ipc` are not
+  implemented yet.
 - Binary distribution policy is not finalized yet for Android Maven artifacts,
   local `.aar` files, or iOS plugin packaging outputs.
 - An editor-driven generated `gdip` shim flow is being considered for future
   iOS packaging, but it is not implemented yet.
-- The example project is planned as the main integration target, but the actual
-  runnable Godot example has not been created yet.
