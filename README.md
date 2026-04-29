@@ -25,6 +25,7 @@ example, and regression-test areas:
 - `tests/integration`: exported-app platform integration tests
 - `scripts`: local build and run helpers for native validation
 - `docs`: project notes and design decisions
+  - `docs/dreams`: exploratory notes for ideas outside the current milestone
 
 Primary references live in [docs/references.md](docs/references.md).
 

@@ -30,6 +30,9 @@ packaging, or platform WebView bridge details.
   iOS plugin structure, `.gdip`, and packaging expectations.
 - [EditorExportPlatformIOS (stable)](https://docs.godotengine.org/en/stable/classes/class_editorexportplatformios.html)
   iOS export platform settings reference.
+- [C#/.NET (stable)](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/index.html)
+  Reference for Godot C# platform support, including Android and iOS export
+  limitations.
 
 ## Android
 
@@ -56,6 +59,17 @@ packaging, or platform WebView bridge details.
   Reference for JavaScript-to-native messaging through
   `window.webkit.messageHandlers`.
 
+## .NET
+
+- [Attributes and reflection](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/reflection-and-attributes/)
+  Reference for C# attribute metadata and runtime reflection.
+- [Native AOT deployment](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+  Reference for Native AOT limitations, platform restrictions, and AOT
+  compatibility analyzers.
+- [Introduction to AOT warnings](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/fixing-warnings)
+  Reference for warning categories that flag code patterns that may fail under
+  Native AOT.
+
 ## Suggested usage in this repo
 
 - When changing Android plugin packaging, start with the Godot Android plugin
@@ -64,3 +78,5 @@ packaging, or platform WebView bridge details.
   `JavascriptInterface`, and `WebMessagePort`.
 - When changing iOS IPC, start with `WKWebView` and
   `WKScriptMessageHandler`.
+- When considering C# test or adapter discovery on mobile, start with Godot
+  C#/.NET platform support and .NET reflection or AOT documentation.
