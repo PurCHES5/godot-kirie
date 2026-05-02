@@ -93,17 +93,13 @@ directories.
 
 ## iOS Packaging Direction
 
-For the current milestone, prefer the standard Godot iOS plugin layout and do
-not block iOS bridge work on installer ergonomics:
+For the current milestone, iOS should be owned by the standard addon tree:
 
-- keep the real iOS plugin description in `.gdip`
-- assume Godot discovers iOS plugins through `res://ios/plugins`
-- do not introduce a custom editor-time sync layer unless it is explicitly part
-  of the task at hand
-
-A future editor plugin may generate a thin `ios/plugins/kirie/Kirie.gdip` shim
-from addon-owned data so users can update mostly through `addons/kirie`, but
-that is deferred work and should not complicate the current IPC milestone.
+- users consume `addons/kirie`
+- `Kirie.xcframework` belongs under `addons/kirie/ios` in produced addon trees
+- iOS native pieces are injected through `EditorExportPlugin` Apple export hooks
+- do not reintroduce `res://ios/plugins` or `.gdip` shims unless the export hook
+  approach fails and the user explicitly chooses that fallback
 
 ## Working Style
 
@@ -201,8 +197,8 @@ configured yet.
 - When changing iOS bridge code, validate the Godot-to-native-to-web path as
   soon as practical.
 - After changing iOS native code under `packages/kirie/native/ios`, always run
-  `scripts/build_kirie_ios.sh` so `examples/basic-ipc/ios/plugins/kirie/Kirie.xcframework`
-  is refreshed before any device testing.
+  `scripts/build_kirie_ios.sh` so `addons/kirie/ios/Kirie.xcframework` is
+  refreshed before any device testing.
 - When changing the IPC shape, make sure at least one real request/response
   round-trip remains covered by the example or integration tests.
 
@@ -258,7 +254,5 @@ infrastructure.
   not exist yet.
 - Richer app-level adapters or invocation APIs above `@gd-kirie/ipc` are not
   implemented yet.
-- Binary distribution policy is not finalized yet for Android Maven artifacts,
-  local `.aar` files, or iOS plugin packaging outputs.
-- An editor-driven generated `gdip` shim flow is being considered for future
-  iOS packaging, but it is not implemented yet.
+- Source tracking policy is not finalized yet for generated binary artifacts
+  such as local `.aar` files and `.xcframework` bundles.

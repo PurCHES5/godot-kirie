@@ -40,13 +40,13 @@ The script will:
 1. Generate a local Xcode project under `.generated/`
 2. Archive `Kirie` for `iphoneos` and `iphonesimulator`
 3. Create `Kirie.xcframework`
-4. Copy the result into `res://ios/plugins/kirie/`
+4. Copy the result into `addons/kirie/ios/`
 
 ## Runtime configuration
 
 No runtime plist keys are required for the current IPC path.
 
-Those keys are surfaced to Godot through the plugin descriptor in `ios/plugins/kirie/Kirie.gdip`.
+Export-time plist keys are injected by the addon export plugin.
 
 ## Notes
 
@@ -57,7 +57,6 @@ Those keys are surfaced to Godot through the plugin descriptor in `ios/plugins/k
 
 ## Current packaging direction
 
-- use Godot's standard iOS plugin flow with a `.gdip` file
-- keep the current milestone compatible with `res://ios/plugins`
-- defer any editor-generated `gdip` shim workflow until after the iOS IPC path
-  is working
+- keep iOS native artifacts inside produced `addons/kirie` trees
+- inject iOS native pieces through the addon export plugin
+- do not depend on `res://ios/plugins` or `.gdip` shims

@@ -64,6 +64,7 @@ Recommended to use [mise](https://mise.jdx.dev/) to manage Godot versions.
 
 Run the Godot editor with the current project:
 
+
 ```bash
 mise x -- godot ./examples/basic-ipc/project.godot
 ```

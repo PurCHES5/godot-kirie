@@ -20,14 +20,16 @@ packaging, or platform WebView bridge details.
   Reference for editor debugger settings such as automatic switching to the
   remote scene tree.
 - [EditorExportPlugin (stable)](https://docs.godotengine.org/en/stable/classes/class_editorexportplugin.html)
-  Reference for `_get_android_libraries()`,
-  `_get_android_dependencies()`, and related export hooks.
+  Reference for Android export hooks and Apple embedded platform hooks such as
+  framework, plist, and C++ code injection.
 - [EditorExportPlatformAndroid (stable)](https://docs.godotengine.org/en/stable/classes/class_editorexportplatformandroid.html)
   Android export platform settings, including Gradle build requirements.
 - [iOS plugins index (stable)](https://docs.godotengine.org/en/stable/tutorials/platform/ios/index.html)
   Entry point for Godot iOS plugin documentation.
 - [Creating iOS plugins](https://docs.godotengine.org/en/stable/tutorials/platform/ios/ios_plugin.html)
-  iOS plugin structure, `.gdip`, and packaging expectations.
+  Reference for Godot native iOS plugin entry points and `.xcframework`
+  support. Kirie uses addon export hooks instead of a project-local `.gdip`
+  shim.
 - [EditorExportPlatformIOS (stable)](https://docs.godotengine.org/en/stable/classes/class_editorexportplatformios.html)
   iOS export platform settings reference.
 - [C#/.NET (stable)](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/index.html)
@@ -90,8 +92,8 @@ packaging, or platform WebView bridge details.
   docs and `EditorExportPlugin`.
 - When changing Android IPC, start with `WebView`,
   `JavascriptInterface`, and `WebMessagePort`.
-- When changing iOS IPC, start with `WKWebView` and
-  `WKScriptMessageHandler`.
+- When changing iOS IPC or packaging, start with `WKWebView`,
+  `WKScriptMessageHandler`, and `EditorExportPlugin`.
 - When considering C# test or adapter discovery on mobile, start with Godot
   C#/.NET platform support and .NET reflection or AOT documentation.
 - When changing npm package publishing, start with npm trusted publishing,

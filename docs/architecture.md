@@ -98,20 +98,17 @@ When loading `http://`, `https://`, or `file://` URLs, Kirie should keep using
 the platform WebView's default loading behavior instead of intercepting or
 rewriting those URLs.
 
-An editor export hook may later help projects include a configured web root,
-such as `res://web`, in the correct platform package locations. That helper is
-deferred; the current plugin design should not depend on it.
+The addon export plugin currently includes `res://web` in the iOS app bundle.
+Android example exports still rely on the project export preset include filters
+for packaged web files.
 
 ## iOS packaging direction
 
-For the current milestone, iOS should follow Godot's standard iOS plugin flow:
+For the current milestone, iOS should follow the same addon-centered shape as
+Android:
 
-- the actual iOS plugin description remains a `.gdip` file
-- the editor-recognized location remains `res://ios/plugins`
-- Kirie should not depend on a custom editor integration to make the iOS bridge
-  function
-
-A future editor plugin may generate a thin `res://ios/plugins/kirie/Kirie.gdip`
-shim from data stored under `addons/kirie` so users can keep installation and
-updates centered on the addon directory. That workflow is deferred until after
-the iOS bridge itself is working.
+- users consume `addons/kirie`
+- produced addon trees include `addons/kirie/ios/Kirie.xcframework`
+- the addon export plugin injects the xcframework, system frameworks, plist
+  content, and native initialization glue through Apple export hooks
+- example projects should not carry a separate `res://ios/plugins` shim
