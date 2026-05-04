@@ -8,7 +8,6 @@ var _kirie := GdKirieScript.new()
 var _test_name := ""
 var _finished := false
 
-
 func _ready() -> void:
 	if not _kirie.is_available():
 		_test_name = "unknown"
@@ -45,8 +44,7 @@ func _resolve_test_name() -> String:
 	if launch_test_name != "":
 		return launch_test_name
 
-	var user_args := OS.get_cmdline_user_args()
-	for arg in user_args:
+	for arg in OS.get_cmdline_args() + OS.get_cmdline_user_args():
 		if arg.begins_with("--kirie-test="):
 			return arg.trim_prefix("--kirie-test=").strip_edges()
 

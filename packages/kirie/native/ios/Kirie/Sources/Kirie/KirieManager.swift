@@ -12,6 +12,9 @@ private extension Notification.Name {
 final class KirieManager: NSObject {
     static let shared = KirieManager()
 
+    private static let hostWindowRetryDelay: TimeInterval = 0.1
+    private static let maxHostWindowResolveAttempts = 50
+
     private let notificationCenter = NotificationCenter.default
     private let sessionID = UUID().uuidString.lowercased()
     private let resourceURLSchemeHandler = KirieResourceURLSchemeHandler()
@@ -24,19 +27,45 @@ final class KirieManager: NSObject {
     }
 
     func createWebView(initialURL: String?) {
-        logInfo("createWebView initialURL=\(initialURL ?? "<nil>")")
+        createWebView(initialURL: initialURL, remainingHostWindowAttempts: Self.maxHostWindowResolveAttempts)
+    }
+
+    private func createWebView(initialURL: String?, remainingHostWindowAttempts: Int) {
+        logInfo(
+            "createWebView initialURL=\(initialURL ?? "<nil>") "
+                + "remainingHostWindowAttempts=\(remainingHostWindowAttempts)"
+        )
 
         guard let hostWindow = resolveHostWindow() else {
+            if remainingHostWindowAttempts > 0 {
+                logInfo("No active host window yet; retrying WebView creation")
+                DispatchQueue.main.asyncAfter(deadline: .now() + Self.hostWindowRetryDelay) { [weak self] in
+                    self?.createWebView(
+                        initialURL: initialURL,
+                        remainingHostWindowAttempts: remainingHostWindowAttempts - 1
+                    )
+                }
+                return
+            }
+
             emitIpcError("Cannot create WebView because no host window was found")
             return
         }
 
         let containerView = ensureContainerView(attachedTo: hostWindow)
         let webView = ensureWebView(attachedTo: containerView)
-        emitWebViewReady()
+        hostWindow.layoutIfNeeded()
 
-        if let initialURL, !initialURL.isEmpty {
-            load(initialURL, in: webView)
+        DispatchQueue.main.async { [weak self, weak webView] in
+            guard let self, let webView, webView === self.webView else {
+                return
+            }
+
+            self.emitWebViewReady()
+
+            if let initialURL, !initialURL.isEmpty {
+                self.load(initialURL, in: webView)
+            }
         }
     }
 
@@ -200,9 +229,7 @@ final class KirieManager: NSObject {
     private func resolveHostWindow() -> UIWindow? {
         let activeScenes = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
-            .filter { scene in
-                scene.activationState == .foregroundActive || scene.activationState == .foregroundInactive
-            }
+            .filter { $0.activationState == .foregroundActive }
 
         for scene in activeScenes {
             if let keyWindow = scene.windows.first(where: \.isKeyWindow) {

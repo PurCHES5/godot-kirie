@@ -85,6 +85,32 @@ void KiriePlugin::sendIpcMessage(String message_json) {
 	kirie_swift_send_ipc_message(encoded_message_json.get_data());
 }
 
+String KiriePlugin::getLaunchOption(String key) {
+	CharString encoded_key = key.utf8();
+	NSString *underscore_key = [NSString stringWithUTF8String:encoded_key.get_data()];
+	NSString *dash_key = [underscore_key stringByReplacingOccurrencesOfString:@"_" withString:@"-"];
+	NSArray<NSString *> *arguments = [[NSProcessInfo processInfo] arguments];
+
+	for (NSUInteger index = 0; index < arguments.count; index++) {
+		NSString *argument = arguments[index];
+		NSArray<NSString *> *option_names = @[ underscore_key, dash_key ];
+
+		for (NSString *option_name in option_names) {
+			NSString *prefix = [NSString stringWithFormat:@"--%@=", option_name];
+			if ([argument hasPrefix:prefix]) {
+				return to_godot_string([argument substringFromIndex:prefix.length]);
+			}
+
+			if ([argument isEqualToString:[NSString stringWithFormat:@"--%@", option_name]]
+				&& index + 1 < arguments.count) {
+				return to_godot_string(arguments[index + 1]);
+			}
+		}
+	}
+
+	return String();
+}
+
 KiriePlugin *KiriePlugin::get_singleton() {
 	return singleton;
 }
@@ -144,6 +170,14 @@ Variant KiriePlugin::callp(const StringName &p_method, const Variant **p_args, i
 
 		sendIpcMessage(String(*p_args[0]));
 		return Variant();
+	}
+
+	if (p_method == StringName("getLaunchOption")) {
+		if (!require_arg_count(r_error, p_argcount, 1)) {
+			return Variant();
+		}
+
+		return getLaunchOption(String(*p_args[0]));
 	}
 
 	return Object::callp(p_method, p_args, p_argcount, r_error);

@@ -34,7 +34,7 @@ func _run_probe(
 		return failure_reason
 
 	print("[Kirie][test] load_html_string probe=%s" % probe_name)
-	var probe_html := probe.read_probe_html()
+	var probe_html := probe.read_probe_html(probe_name)
 	if probe_html == "":
 		return probe.failure_reason()
 

@@ -30,9 +30,11 @@ targets:
       SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
       CLANG_CXX_LANGUAGE_STANDARD: gnu++17
       HEADER_SEARCH_PATHS:
+        - "$(inherited)"
         - "$(GODOT_SOURCE_ROOT)"
+        - "$(GODOT_SOURCE_ROOT)/core"
         - "$(GODOT_SOURCE_ROOT)/platform/ios"
-        - "$(GODOT_SOURCE_ROOT)/bin/obj/platform/ios"
+        - "$(SRCROOT)/../../../../../godot"
     dependencies:
       - sdk: Foundation.framework
       - sdk: UIKit.framework

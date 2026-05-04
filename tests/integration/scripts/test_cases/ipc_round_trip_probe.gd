@@ -16,7 +16,7 @@ func run(kirie: GdKirie, tree: SceneTree, test_name: String) -> String:
 		return failure_reason
 
 	print("[Kirie][test] load_html_string probe=%s" % PROBE_NAME)
-	var probe_html := probe.read_probe_html()
+	var probe_html := probe.read_probe_html(PROBE_NAME)
 	if probe_html == "":
 		return probe.failure_reason()
 

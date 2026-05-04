@@ -135,7 +135,10 @@ contract directly:
 For tests that do not care about asset loading, the GDScript case reads
 `probe.html` and injects it with `load_html_string(...)`. This keeps the test
 case in Godot while preserving HTML/JavaScript syntax highlighting in the
-fixture file.
+fixture file. HTML-string tests pass the probe name through an injected
+`globalThis.__kirieProbeName` value instead of deriving it from
+`location.search`, because WebKit's `loadHTMLString(_:baseURL:)` treats
+`baseURL` as the URL for resolving relative references.
 
 For tests that do care about exported resources, the case loads
 `res://web/probe.html?...` with `load_url(...)`.
