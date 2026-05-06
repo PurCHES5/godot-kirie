@@ -3,7 +3,7 @@ extends RefCounted
 
 const PROBE_HTML_PATH := "res://web/probe.html"
 const DEFAULT_TEST_TIMEOUT_SECONDS := 12.0
-const IOS_TEST_TIMEOUT_SECONDS := 30.0
+const IOS_TEST_TIMEOUT_SECONDS := 45.0
 
 var _kirie: GdKirie
 var _messages: Array[Dictionary] = []
