@@ -1,6 +1,6 @@
 extends RefCounted
 
-const PROBE_NAME := "round_trip"
+const PROBE_NAME := "ipc_round_trip"
 const TestProbeScript = preload("res://scripts/test_probe.gd")
 
 
@@ -15,12 +15,8 @@ func run(kirie: GdKirie, tree: SceneTree, test_name: String) -> String:
 	if failure_reason != "":
 		return failure_reason
 
-	print("[Kirie][test] load_html_string probe=%s" % PROBE_NAME)
-	var probe_html := probe.read_probe_html(PROBE_NAME)
-	if probe_html == "":
-		return probe.failure_reason()
-
-	kirie.load_html_string(probe_html, _probe_url(PROBE_NAME, test_name))
+	print("[Kirie][test] load_url probe=%s" % PROBE_NAME)
+	kirie.load_url(_probe_url(PROBE_NAME, test_name))
 
 	failure_reason = await probe.wait_for_message("web_ready", PROBE_NAME)
 	if failure_reason != "":
@@ -38,7 +34,7 @@ func run(kirie: GdKirie, tree: SceneTree, test_name: String) -> String:
 
 
 func _probe_url(probe_name: String, test_name: String) -> String:
-	return "https://probe.kirie.invalid/?probe=%s&test=%s" % [
+	return "res://web/probe.html?probe=%s&test=%s" % [
 		probe_name.uri_encode(),
 		test_name.uri_encode(),
 	]

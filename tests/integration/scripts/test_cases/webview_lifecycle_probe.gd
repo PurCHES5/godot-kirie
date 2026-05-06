@@ -33,12 +33,8 @@ func _run_probe(
 	if failure_reason != "":
 		return failure_reason
 
-	print("[Kirie][test] load_html_string probe=%s" % probe_name)
-	var probe_html := probe.read_probe_html(probe_name)
-	if probe_html == "":
-		return probe.failure_reason()
-
-	kirie.load_html_string(probe_html, _probe_url(probe_name, test_name))
+	print("[Kirie][test] load_url probe=%s" % probe_name)
+	kirie.load_url(_probe_url(probe_name, test_name))
 
 	failure_reason = await probe.wait_for_message("web_ready", probe_name)
 	if failure_reason != "":
@@ -56,7 +52,7 @@ func _run_probe(
 
 
 func _probe_url(probe_name: String, test_name: String) -> String:
-	return "https://probe.kirie.invalid/?probe=%s&test=%s" % [
+	return "res://web/probe.html?probe=%s&test=%s" % [
 		probe_name.uri_encode(),
 		test_name.uri_encode(),
 	]

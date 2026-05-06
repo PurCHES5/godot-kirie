@@ -27,19 +27,12 @@ func reset() -> void:
 	_webview_is_ready = false
 
 
-func read_probe_html(probe_name: String = "") -> String:
+func read_probe_html() -> String:
 	if not FileAccess.file_exists(PROBE_HTML_PATH):
 		_probe_error = "Missing probe HTML: %s" % PROBE_HTML_PATH
 		return ""
 
-	var probe_html := FileAccess.get_file_as_string(PROBE_HTML_PATH)
-	if probe_name == "":
-		return probe_html
-
-	return "<script>globalThis.__kirieProbeName = %s;</script>\n%s" % [
-		JSON.stringify(probe_name),
-		probe_html,
-	]
+	return FileAccess.get_file_as_string(PROBE_HTML_PATH)
 
 
 func failure_reason() -> String:
