@@ -1,0 +1,51 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  packages:
+    name: Publish NuGet Packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install mise
+        uses: jdx/mise-action@v3
+        with:
+            install: true
+            install_args: dotnet
+            cache: true
+
+      - name: Restore dependencies
+        run: mise x -- dotnet restore GdKirie.slnx
+
+      - name: Build release
+        run: mise x -- dotnet build GdKirie.slnx --configuration Release
+
+      - name: Run tests
+        run: mise x -- dotnet test --solution GdKirie.slnx --configuration Release --no-build
+
+      - name: Pack NuGet package
+        run: mise x -- dotnet pack packages/GdKirie.EventaAdapter/GdKirie.EventaAdapter.csproj --configuration Release --no-build
+
+      - name: Publish to NuGet
+        run: |
+          mise x -- dotnet nuget push "packages/GdKirie.EventaAdapter/bin/Release/*.nupkg" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
