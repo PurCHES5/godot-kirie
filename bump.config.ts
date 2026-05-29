@@ -5,6 +5,13 @@ import { defineConfig } from "bumpp";
 export default defineConfig({
   all: true,
   commit: "release: v%s",
+  files: [
+    {
+      file: "packages/GdKirie.EventaAdapter/GdKirie.EventaAdapter.csproj",
+      pattern: /<Version>[^<]+<\/Version>/,
+      replacement: "<Version>%s</Version>",
+    },
+  ],
   execute: () => {
     execFileSync("pnpm", ["run", "build:packages"], { stdio: "inherit" });
     execFileSync("pnpm", ["publish", "-r", "--access", "public", "--no-git-checks", "--dry-run"], {
